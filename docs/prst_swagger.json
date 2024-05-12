@@ -1,0 +1,46 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "gin框架API",
+        "title": "prst API",
+        "contact": {},
+        "version": "0.0.1"
+    },
+    "paths": {
+        "/api/v1/example/{name}": {
+            "get": {
+                "description": "展示例子",
+                "tags": [
+                    "Example"
+                ],
+                "summary": "展示例子",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "名称",
+                        "name": "name",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/router.Respo"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "router.Respo": {
+            "type": "object",
+            "properties": {
+                "info": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

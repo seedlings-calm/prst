@@ -1,0 +1,29 @@
+definitions:
+  router.Respo:
+    properties:
+      info:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: gin框架API
+  title: prst API
+  version: 0.0.1
+paths:
+  /api/v1/example/{name}:
+    get:
+      description: 展示例子
+      parameters:
+      - description: 名称
+        in: path
+        name: name
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.Respo'
+      summary: 展示例子
+      tags:
+      - Example
+swagger: "2.0"
