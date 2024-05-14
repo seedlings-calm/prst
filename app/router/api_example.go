@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	jwt "github.com/seedlings-calm/prst/middleware"
 )
 
 func init() {
@@ -12,7 +13,7 @@ func init() {
 }
 
 // registerApiExampleRouter
-func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *interface{}) {
+func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
 	r := v1.Group("/example")
 	{
 		r.GET("/:name", GetExample)

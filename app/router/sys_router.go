@@ -7,9 +7,10 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 
 	_ "github.com/seedlings-calm/prst/docs" // swagger读取文档配置路径
+	jwt "github.com/seedlings-calm/prst/middleware"
 )
 
-func InitSysRouter(r *gin.Engine, authMiddleware *interface{}) *gin.RouterGroup {
+func InitSysRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gin.RouterGroup {
 	g := r.Group("")
 	// 静态文件
 	sysStaticFileRouter(g)
