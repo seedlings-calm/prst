@@ -14,6 +14,7 @@ func init() {
 
 // registerApiExampleRouter
 func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
+
 	r := v1.Group("/example")
 	{
 		r.GET("/:name", GetExample)
@@ -27,7 +28,6 @@ func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMid
 // @Success 200 {object} Respo
 // @Router /api/v1/example/{name} [get]
 func GetExample(c *gin.Context) {
-
 	c.Set("status", http.StatusOK)
 	c.AbortWithStatusJSON(http.StatusOK, Respo{
 		Info: fmt.Sprintf("hello to %s", c.Param("name")),
