@@ -32,19 +32,6 @@ func NewGinLogger(config ZapLogger) *GinLogger {
 	return &GinLogger{Logger: logger}
 }
 func newCore(config ZapLogger) zapcore.Core {
-	encoderConfig := zapcore.EncoderConfig{
-		TimeKey:        "time",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "caller",
-		MessageKey:     "msg",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-	}
 
 	lumberjackLogger := &lumberjack.Logger{
 		Filename:   config.FilePath,
@@ -53,10 +40,10 @@ func newCore(config ZapLogger) zapcore.Core {
 		MaxAge:     config.MaxAge,
 		Compress:   config.Compress,
 	}
-	consoleEncoder := zapcore.NewConsoleEncoder(encoderConfig)
+	consoleEncoder := zapcore.NewConsoleEncoder(consoleEncoderConfig())
 	consoleDebugging := zapcore.Lock(os.Stdout)
 
-	fileEncoder := zapcore.NewJSONEncoder(encoderConfig)
+	fileEncoder := zapcore.NewJSONEncoder(fileEncoderConfig())
 	fileDebugging := zapcore.AddSync(lumberjackLogger)
 
 	//写入文件和输出到控制台
@@ -99,4 +86,38 @@ func ZapLoggerInit() *GinLogger {
 
 	return NewGinLogger(config)
 
+}
+
+// 文件存储日志  配置
+func fileEncoderConfig() zapcore.EncoderConfig {
+	return zapcore.EncoderConfig{
+		TimeKey:        "time",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "msg",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+}
+
+// 控制台输出  配置
+func consoleEncoderConfig() zapcore.EncoderConfig {
+	return zapcore.EncoderConfig{
+		TimeKey:        "time",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "caller",
+		MessageKey:     "msg",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseColorLevelEncoder, //使用带颜色编码日志级别
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
 }
