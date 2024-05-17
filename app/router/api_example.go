@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/seedlings-calm/prst/middleware"
 	jwt "github.com/seedlings-calm/prst/middleware"
 )
 
@@ -30,10 +31,12 @@ func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMid
 func GetExample(c *gin.Context) {
 	c.Set("status", http.StatusOK)
 	c.AbortWithStatusJSON(http.StatusOK, Respo{
-		Info: fmt.Sprintf("hello to %s", c.Param("name")),
+		Info:      fmt.Sprintf("hello to %s", c.Param("name")),
+		RequestId: c.GetHeader(middleware.XRequestId),
 	})
 }
 
 type Respo struct {
-	Info string
+	Info      string
+	RequestId string
 }

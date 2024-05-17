@@ -1,4 +1,4 @@
-package handle
+package common
 
 import (
 	"time"
@@ -10,6 +10,7 @@ import (
 
 // AuthInit jwt验证new
 func JWTInit() (*jwt.GinJWTMiddleware, error) {
+
 	return jwt.New(&jwt.GinJWTMiddleware{
 		Realm:           "prst api",
 		Key:             []byte("prst"),

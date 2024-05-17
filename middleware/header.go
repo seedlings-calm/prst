@@ -1,8 +1,9 @@
 package middleware
 
-import "github.com/gin-gonic/gin"
-
-var Mode = "dev"
+import (
+	"github.com/gin-gonic/gin"
+	cfg "github.com/seedlings-calm/prst/config"
+)
 
 func AllowAllOptions() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -21,7 +22,7 @@ func AllowAllOptions() gin.HandlerFunc {
 }
 
 func CheckOptions() gin.HandlerFunc {
-	if Mode == "dev" {
+	if cfg.AppModel == cfg.DevModel {
 		return AllowAllOptions()
 	}
 	return func(c *gin.Context) {

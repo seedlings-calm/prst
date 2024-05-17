@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/seedlings-calm/prst/app/handle"
 	"github.com/seedlings-calm/prst/app/router"
 	"github.com/seedlings-calm/prst/common"
 	cfg "github.com/seedlings-calm/prst/config"
@@ -23,7 +22,7 @@ func main() {
 	//初始化配置信息
 	_ = cfg.Setup()
 	//初始化jwt
-	jwtMW, err := handle.JWTInit()
+	jwtMW, err := common.JWTInit()
 	if err != nil {
 		panic("初始化jwt失败")
 	}
@@ -32,8 +31,8 @@ func main() {
 	r := gin.New()
 	//初始化gin配置
 	gin.SetMode(cfg.ModelSwitchGinModel())
-	r.Use(gin.Recovery())
-	r.Use(middleware.CheckOptions())
+
+	middleware.InitMiddleWare(r)
 	//设置日志记录
 	r.Use(zapLogger.Middleware())
 	setup()
@@ -41,5 +40,5 @@ func main() {
 	for _, f := range AppRouters {
 		f(r, jwtMW)
 	}
-	r.Run(":8081")
+	r.Run(cfg.Config.App.Host + ":" + cfg.Config.App.Port)
 }

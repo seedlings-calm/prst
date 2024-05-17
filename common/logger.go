@@ -58,10 +58,6 @@ func (g *GinLogger) Middleware() gin.HandlerFunc {
 			zap.Duration("latency", time.Since(start)),
 			zap.Int("status", c.Writer.Status()),
 		)
-		g.Logger.Info(
-			"Config",
-			zap.Any("config", cfg.Config),
-		)
 		// 处理请求
 		c.Next()
 
@@ -135,7 +131,7 @@ func ConfigLevelSwitchZapLevel(i int8) zapcore.Level {
 
 func LoggerDefault() cfg.ZapLogger {
 	return cfg.ZapLogger{
-		FilePath:   "logs/",
+		FilePath:   "logs/prst_logs.log",
 		Level:      zapcore.InfoLevel,
 		MaxSize:    1, // MB
 		MaxBackups: 3,

@@ -8,10 +8,10 @@ linux:
 
 dev:
 	go  run ./ -c config.dev.yml
-prod: 
+release: 
 	go run  ./ -c config.yml
 
-.PHONY: dev prod
+.PHONY: dev release
 
 swag:
 	swag init --parseDependency --parseDepth=6 --instanceName prst -o ./docs/   

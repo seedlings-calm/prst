@@ -7,8 +7,7 @@ import (
 
 var (
 	routerNoCheckRole = make([]func(*gin.RouterGroup), 0)
-	//TODO: interface{} 更改为验证中间件
-	routerCheckRole = make([]func(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware), 0)
+	routerCheckRole   = make([]func(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware), 0)
 )
 
 func InitExamplesRouter(r *gin.Engine, authMiddleware *jwt.GinJWTMiddleware) *gin.Engine {
