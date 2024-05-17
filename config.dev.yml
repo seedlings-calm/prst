@@ -1,0 +1,14 @@
+app: 
+  # 服务器ip，默认使用 0.0.0.0
+ host: 0.0.0.0
+  # 端口号
+ port: 8080 # 服务端口号
+# 日志
+logger: 
+#  stdout: "console" # 日志输出方式: console,file,  废弃使用，直接使用AppModel 来决定输出方式
+ filePath: "logs/" #日志文件存储位置 
+ maxSize: 5   #进行切割之前，日志文件最大值(单位：MB)
+ maxBackups: 10  #保留旧文件的最大个数
+ maxAge: 7  # 保留旧文件的最大天数
+ level: 0   # zapcore.Level
+ compress: false  #是否压缩/归档旧文件

@@ -5,6 +5,7 @@ import (
 	"github.com/seedlings-calm/prst/app/handle"
 	"github.com/seedlings-calm/prst/app/router"
 	"github.com/seedlings-calm/prst/common"
+	cfg "github.com/seedlings-calm/prst/config"
 	"github.com/seedlings-calm/prst/middleware"
 )
 
@@ -19,21 +20,22 @@ func setup() {
 // @version 0.0.1
 // @description gin框架API
 func main() {
+	//初始化配置信息
+	_ = cfg.Setup()
 	//初始化jwt
 	jwtMW, err := handle.JWTInit()
 	if err != nil {
 		panic("初始化jwt失败")
 	}
 	//初始化zaplogger
-	zapLogger := common.ZapLoggerInit()
-
+	zapLogger := common.LoggerInit()
 	r := gin.New()
 	//初始化gin配置
+	gin.SetMode(cfg.ModelSwitchGinModel())
 	r.Use(gin.Recovery())
 	r.Use(middleware.CheckOptions())
 	//设置日志记录
 	r.Use(zapLogger.Middleware())
-
 	setup()
 	//加载所有路由
 	for _, f := range AppRouters {

@@ -6,6 +6,13 @@ linux:
 .PHONY: window linux
 
 
+dev:
+	go  run ./ -c config.dev.yml
+prod: 
+	go run  ./ -c config.yml
+
+.PHONY: dev prod
+
 swag:
 	swag init --parseDependency --parseDepth=6 --instanceName prst -o ./docs/   
 .PHONY:

@@ -5,33 +5,25 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	cfg "github.com/seedlings-calm/prst/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-// ZapLogger 定义日志配置参数
-type ZapLogger struct {
-	FilePath   string //日志文件位置
-	MaxSize    int    //  进行切割之前，日志文件最大值(单位：MB)
-	MaxBackups int    //保留旧文件的最大个数
-	MaxAge     int    //  保留旧文件的最大天数
-	Level      zapcore.Level
-	Compress   bool //是否压缩/归档旧文件
-}
-
 type GinLogger struct {
 	Logger *zap.Logger
 }
 
-func NewGinLogger(config ZapLogger) *GinLogger {
+func NewGinLogger(config cfg.ZapLogger) *GinLogger {
 	core := newCore(config)
 
 	logger := zap.New(core)
 
 	return &GinLogger{Logger: logger}
 }
-func newCore(config ZapLogger) zapcore.Core {
+
+func newCore(config cfg.ZapLogger) zapcore.Core {
 
 	lumberjackLogger := &lumberjack.Logger{
 		Filename:   config.FilePath,
@@ -40,20 +32,20 @@ func newCore(config ZapLogger) zapcore.Core {
 		MaxAge:     config.MaxAge,
 		Compress:   config.Compress,
 	}
-	consoleEncoder := zapcore.NewConsoleEncoder(consoleEncoderConfig())
+	if cfg.AppModel == cfg.ReleaseMode {
+		fileEncoder := zapcore.NewJSONEncoder(fileEncoderConfig())
+		fileDebugging := zapcore.AddSync(lumberjackLogger)
+		return zapcore.NewTee(
+			zapcore.NewCore(fileEncoder, fileDebugging, config.Level),
+		)
+	}
 	consoleDebugging := zapcore.Lock(os.Stdout)
+	consoleEncoder := zapcore.NewConsoleEncoder(consoleEncoderConfig())
 
-	fileEncoder := zapcore.NewJSONEncoder(fileEncoderConfig())
-	fileDebugging := zapcore.AddSync(lumberjackLogger)
-
-	//写入文件和输出到控制台
-	core := zapcore.NewTee(
-		//控制台
-		zapcore.NewCore(consoleEncoder, consoleDebugging, zapcore.DebugLevel),
-		//文件
-		zapcore.NewCore(fileEncoder, fileDebugging, zapcore.DebugLevel),
+	//输出到控制台
+	return zapcore.NewTee(
+		zapcore.NewCore(consoleEncoder, consoleDebugging, config.Level),
 	)
-	return core
 }
 func (g *GinLogger) Middleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -66,22 +58,20 @@ func (g *GinLogger) Middleware() gin.HandlerFunc {
 			zap.Duration("latency", time.Since(start)),
 			zap.Int("status", c.Writer.Status()),
 		)
+		g.Logger.Info(
+			"Config",
+			zap.Any("config", cfg.Config),
+		)
 		// 处理请求
 		c.Next()
 
 	}
 }
 
-// TODO:  根据配置文件，更改初始化
-func ZapLoggerInit() *GinLogger {
-
-	config := ZapLogger{
-		FilePath:   "./log/prst_zap.log",
-		Level:      zapcore.InfoLevel,
-		MaxSize:    1, // MB
-		MaxBackups: 3,
-		MaxAge:     28,    // Days
-		Compress:   false, // disabled by default
+func LoggerInit() *GinLogger {
+	config := cfg.Config.ZapLogger
+	if IsEmptyStruct(config) {
+		config = LoggerDefault()
 	}
 
 	return NewGinLogger(config)
@@ -119,5 +109,37 @@ func consoleEncoderConfig() zapcore.EncoderConfig {
 		EncodeTime:     zapcore.ISO8601TimeEncoder,
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+}
+
+func ConfigLevelSwitchZapLevel(i int8) zapcore.Level {
+	switch i {
+	case -1:
+		return zapcore.DebugLevel
+	case 0:
+		return zapcore.InfoLevel
+	case 1:
+		return zapcore.WarnLevel
+	case 2:
+		return zapcore.ErrorLevel
+	case 3:
+		return zapcore.DPanicLevel
+	case 4:
+		return zapcore.PanicLevel
+	case 5:
+		return zapcore.FatalLevel
+	default:
+		return zapcore.InfoLevel
+	}
+}
+
+func LoggerDefault() cfg.ZapLogger {
+	return cfg.ZapLogger{
+		FilePath:   "logs/",
+		Level:      zapcore.InfoLevel,
+		MaxSize:    1, // MB
+		MaxBackups: 3,
+		MaxAge:     7,     // Days
+		Compress:   false, // disabled by default
 	}
 }
