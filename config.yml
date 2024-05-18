@@ -5,7 +5,8 @@ app:
  port: 8080 # 服务端口号
 # 日志
 logger: 
- filePath: "logs/" #日志文件位置 
+#  stdout: "console" # 日志输出方式: console,file,  废弃使用，直接使用AppModel 来决定输出方式
+ filePath: "logs/prst_logs.log" #日志文件存储位置 
  maxSize: 5   #进行切割之前，日志文件最大值(单位：MB)
  maxBackups: 10  #保留旧文件的最大个数
  maxAge: 7  # 保留旧文件的最大天数

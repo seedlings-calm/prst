@@ -23,18 +23,24 @@ func NewGinLogger(config cfg.ZapLogger) *GinLogger {
 	return &GinLogger{Logger: logger}
 }
 
-func newCore(config cfg.ZapLogger) zapcore.Core {
-
-	lumberjackLogger := &lumberjack.Logger{
+func LumberjackLogger(config cfg.ZapLogger) *lumberjack.Logger {
+	return &lumberjack.Logger{
 		Filename:   config.FilePath,
 		MaxSize:    config.MaxSize,
 		MaxBackups: config.MaxBackups,
 		MaxAge:     config.MaxAge,
 		Compress:   config.Compress,
 	}
+}
+func newCore(config cfg.ZapLogger) zapcore.Core {
+
 	if cfg.AppModel == cfg.ReleaseMode {
+		// 设置 Gin 的 panic handler
+		gin.DefaultWriter = LumberjackLogger(config)
+		gin.DefaultErrorWriter = LumberjackLogger(config)
+
 		fileEncoder := zapcore.NewJSONEncoder(fileEncoderConfig())
-		fileDebugging := zapcore.AddSync(lumberjackLogger)
+		fileDebugging := zapcore.AddSync(LumberjackLogger(config))
 		return zapcore.NewTee(
 			zapcore.NewCore(fileEncoder, fileDebugging, config.Level),
 		)
@@ -48,6 +54,7 @@ func newCore(config cfg.ZapLogger) zapcore.Core {
 	)
 }
 func (g *GinLogger) Middleware() gin.HandlerFunc {
+
 	return func(c *gin.Context) {
 		start := time.Now()
 		// 记录请求信息
@@ -85,7 +92,7 @@ func fileEncoderConfig() zapcore.EncoderConfig {
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeTime:     zapcore.TimeEncoderOfLayout("2006/01/02 - 15:04:05.000"),
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
@@ -102,7 +109,7 @@ func consoleEncoderConfig() zapcore.EncoderConfig {
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseColorLevelEncoder, //使用带颜色编码日志级别
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeTime:     zapcore.TimeEncoderOfLayout("2006/01/02 - 15:04:05.000"),
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}

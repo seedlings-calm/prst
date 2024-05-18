@@ -19,6 +19,7 @@ func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMid
 	r := v1.Group("/example")
 	{
 		r.GET("/:name", GetExample)
+		r.GET("", GetExample)
 	}
 }
 
@@ -30,6 +31,10 @@ func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMid
 // @Router /api/v1/example/{name} [get]
 func GetExample(c *gin.Context) {
 	c.Set("status", http.StatusOK)
+
+	if c.Param("name") == "" {
+		panic("么有参数")
+	}
 	c.AbortWithStatusJSON(http.StatusOK, Respo{
 		Info:      fmt.Sprintf("hello to %s", c.Param("name")),
 		RequestId: c.GetHeader(middleware.XRequestId),

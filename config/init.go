@@ -13,6 +13,7 @@ import (
 // 配置来决定项目运行模式
 
 func Setup() *viper.Viper {
+	log.Println("配置初始化")
 	var config string
 	// 定义命令行参数
 	flag.StringVar(&config, "c", "", "choose config file.")
@@ -54,6 +55,14 @@ func Setup() *viper.Viper {
 
 	if err = v.Unmarshal(&Config); err != nil {
 		panic(err)
+	}
+
+	//二次确定模式
+	switch Config.App.Model {
+	case DevModel:
+		AppModel = DevModel
+	case ReleaseMode:
+		AppModel = ReleaseMode
 	}
 
 	return v

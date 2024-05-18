@@ -8,8 +8,9 @@ type FileConfig struct {
 }
 
 type App struct {
-	Host string `json:"app" yaml:"host" mapstructure:"host"`
-	Port string `json:"port" yaml:"port" mapstructure:"port"`
+	Model string `json:"model" yaml:"model" mapstructure:"model"`
+	Host  string `json:"host" yaml:"host" mapstructure:"host"`
+	Port  string `json:"port" yaml:"port" mapstructure:"port"`
 }
 
 // ZapLogger 定义日志配置参数

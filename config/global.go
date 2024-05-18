@@ -5,7 +5,7 @@ import "github.com/gin-gonic/gin"
 var (
 	DevModel          = "dev"
 	ReleaseMode       = "release"
-	AppModel          string // 开发模式： dev,release
+	AppModel          string // 开发模式： dev,release   优先级: *.yml配置 > 文件分类配置（config.yml 为release, 其余配置文件为dev）
 	ConfigDefaultFile = "config.dev.yml"
 	ConfigDevFile     = "config.dev.yml"
 	ConfigReleaseFile = "config.yml"
@@ -18,9 +18,9 @@ var (
 
 func ModelSwitchGinModel() string {
 	switch AppModel {
-	case "dev":
+	case DevModel:
 		return gin.DebugMode
-	case "release":
+	case ReleaseMode:
 		return gin.ReleaseMode
 	}
 	return gin.DebugMode

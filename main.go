@@ -10,7 +10,7 @@ import (
 
 var AppRouters = make([]func(r *gin.Engine, mw *middleware.GinJWTMiddleware), 0)
 
-func setup() {
+func init() {
 	//  注册路由 fixme 其他应用的路由，在本目录新建文件放在init方法
 	AppRouters = append(AppRouters, router.InitRouter)
 }
@@ -27,15 +27,17 @@ func main() {
 		panic("初始化jwt失败")
 	}
 	//初始化zaplogger
-	zapLogger := common.LoggerInit()
-	r := gin.New()
-	//初始化gin配置
+	_ = common.LoggerInit()
+
 	gin.SetMode(cfg.ModelSwitchGinModel())
 
+	r := gin.New()
+	//适配gin的运行模式
+
 	middleware.InitMiddleWare(r)
-	//设置日志记录
-	r.Use(zapLogger.Middleware())
-	setup()
+
+	// r.Use(zapLogger.Middleware())
+
 	//加载所有路由
 	for _, f := range AppRouters {
 		f(r, jwtMW)

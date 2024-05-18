@@ -1,4 +1,5 @@
 app: 
+ model: '' # 开发模式 dev,release 如果为空 ，根据读取文件定义模式，config.yml为release模式，其余为dev模式
   # 服务器ip，默认使用 0.0.0.0
  host: 0.0.0.0
   # 端口号
