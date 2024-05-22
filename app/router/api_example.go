@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/seedlings-calm/prst/middleware"
 	jwt "github.com/seedlings-calm/prst/middleware"
 )
 
@@ -37,7 +36,7 @@ func GetExample(c *gin.Context) {
 	}
 	c.AbortWithStatusJSON(http.StatusOK, Respo{
 		Info:      fmt.Sprintf("hello to %s", c.Param("name")),
-		RequestId: c.GetHeader(middleware.XRequestId),
+		RequestId: c.GetHeader(jwt.XRequestId),
 	})
 }
 

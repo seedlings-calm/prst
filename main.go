@@ -1,6 +1,11 @@
 package main
 
 import (
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/seedlings-calm/prst/app/router"
 	"github.com/seedlings-calm/prst/common"
@@ -38,9 +43,34 @@ func main() {
 
 	// r.Use(zapLogger.Middleware())
 
+	// 初始化 Prometheus 指标
+	prometheusMetrics := common.NewPrometheusMetrics()
+	// 注册 Prometheus 中间件
+	r.Use(common.PrometheusMiddleware(prometheusMetrics))
+
 	//加载所有路由
 	for _, f := range AppRouters {
 		f(r, jwtMW)
 	}
-	r.Run(cfg.Config.App.Host + ":" + cfg.Config.App.Port)
+	// 设置 pprof 监听路径
+	// go func() {
+	// 	if err := http.ListenAndServe(cfg.Config.App.Host+":"+cfg.Config.App.Port, nil); err != nil {
+	// 		panic(err)
+	// 	}
+	// }()
+
+	// 定时记录内存使用情况和 CPU 使用率
+	go func() {
+		for {
+			prometheusMetrics.RecordMemoryUsage()
+			prometheusMetrics.RecordCPUUsage()
+			time.Sleep(10 * time.Second)
+		}
+	}()
+	r.Run(":" + cfg.Config.App.Port)
+
+	// 等待中断信号以优雅地关闭服务器
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 }

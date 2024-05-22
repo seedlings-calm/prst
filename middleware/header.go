@@ -20,6 +20,7 @@ func Options() gin.HandlerFunc {
 	}
 }
 
+// 设置http header安全
 func Secure(c *gin.Context) {
 	c.Header("Access-Control-Allow-Origin", "*")
 	c.Header("X-Frame-Options", "DENY")
