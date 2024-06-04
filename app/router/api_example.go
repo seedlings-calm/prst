@@ -1,10 +1,9 @@
 package router
 
 import (
-	"fmt"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/seedlings-calm/prst/app/models"
+	"github.com/seedlings-calm/prst/core"
 	jwt "github.com/seedlings-calm/prst/middleware"
 )
 
@@ -17,8 +16,7 @@ func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMid
 
 	r := v1.Group("/example")
 	{
-		r.GET("/:name", GetExample)
-		r.GET("", GetExample)
+		r.GET("/:name/:phone", GetExample)
 	}
 }
 
@@ -26,18 +24,22 @@ func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMid
 // @Description 展示例子
 // @Tags Example
 // @Param name path string false "名称"
+// @Param phone path string false "手机号"
 // @Success 200 {object} Respo
-// @Router /api/v1/example/{name} [get]
+// @Router /api/v1/example/{name}/{phone} [get]
 func GetExample(c *gin.Context) {
-	c.Set("status", http.StatusOK)
 
-	if c.Param("name") == "" {
-		panic("么有参数")
+	data := models.Query{}
+	ba := core.Ba.MakeContext(c).
+		Bind(&data)
+
+	err := ba.GetError()
+	if err != nil {
+		ba.ErrorResponse(500, err.Error())
+		return
 	}
-	c.AbortWithStatusJSON(http.StatusOK, Respo{
-		Info:      fmt.Sprintf("hello to %s", c.Param("name")),
-		RequestId: c.GetHeader(jwt.XRequestId),
-	})
+
+	ba.SuccessResponse("", data)
 }
 
 type Respo struct {

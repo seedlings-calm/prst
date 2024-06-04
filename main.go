@@ -4,7 +4,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/seedlings-calm/prst/app/router"
@@ -60,13 +59,13 @@ func main() {
 	// }()
 
 	// 定时记录内存使用情况和 CPU 使用率
-	go func() {
-		for {
-			prometheusMetrics.RecordMemoryUsage()
-			prometheusMetrics.RecordCPUUsage()
-			time.Sleep(10 * time.Second)
-		}
-	}()
+	// go func() {
+	// 	for {
+	// 		prometheusMetrics.RecordMemoryUsage()
+	// 		prometheusMetrics.RecordCPUUsage()
+	// 		time.Sleep(10 * time.Second)
+	// 	}
+	// }()
 	r.Run(":" + cfg.Config.App.Port)
 
 	// 等待中断信号以优雅地关闭服务器

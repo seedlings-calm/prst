@@ -33,3 +33,14 @@ func RequestId(key string) gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+// GenerateXRequestId 生成requestID
+func GenerateXRequestIdFromContext(c *gin.Context) string {
+	requestId := c.GetHeader(XRequestId)
+	if requestId == "" {
+		requestId = uuid.New().String()
+		c.Header(XRequestId, requestId)
+
+	}
+	return requestId
+}
