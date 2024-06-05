@@ -7,7 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/seedlings-calm/prst/common"
 	cfg "github.com/seedlings-calm/prst/config"
+	"github.com/seedlings-calm/prst/db"
 	"github.com/seedlings-calm/prst/middleware"
+	"gorm.io/gorm"
 )
 
 var Ba = BaseApp{
@@ -19,7 +21,13 @@ type BaseApp struct {
 	Context *gin.Context
 	//日志
 	Log    *common.GinLogger
+	Mysql  *gorm.DB
 	errors error
+}
+
+func (e *BaseApp) MakeMysql() *BaseApp {
+	e.Mysql = db.Db
+	return e
 }
 
 // MakeContext 设置http上下文

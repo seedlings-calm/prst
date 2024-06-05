@@ -3,8 +3,9 @@ package cfg
 import "go.uber.org/zap/zapcore"
 
 type FileConfig struct {
-	App       App       `json:"app" yaml:"app" mapstructure:"app"`
-	ZapLogger ZapLogger `json:"logger" yaml:"logger" mapstructure:"logger"`
+	App       App         `json:"app" yaml:"app" mapstructure:"app"`
+	ZapLogger ZapLogger   `json:"logger" yaml:"logger" mapstructure:"logger"`
+	Mysql     MysqlConfig `json:"mysql" yaml:"mysql" mapstructure:"mysql"`
 }
 
 type App struct {
@@ -22,4 +23,14 @@ type ZapLogger struct {
 	MaxAge     int           ` json:"maxAge" yaml:"maxAge" mapstructure:"maxAge"`             //  保留旧文件的最大天数
 	Level      zapcore.Level ` json:"level" yaml:"level" mapstructure:"level"`
 	Compress   bool          ` json:"compress" yaml:"compress" mapstructure:"compress"` //是否压缩/归档旧文件
+}
+
+type MysqlConfig struct {
+	Host     string `json:"host" yaml:"host" mapstructure:"host"`
+	Port     int    `json:"port" yaml:"port" mapstructure:"port"`
+	User     string `json:"user" yaml:"user" mapstructure:"user"`
+	Password string `json:"password" yaml:"password" mapstructure:"password"`
+	DBName   string `json:"dbName" yaml:"dbName" mapstructure:"dbName"`
+	OpenConn int    `json:"openConn" yaml:"openConn" mapstructure:"openConn"`
+	IdleConn int    `json:"idleConn" yaml:"idleConn" mapstructure:"idleConn"`
 }
