@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prst-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: prst
+  template:
+    metadata:
+      labels:
+        app: prst
+    spec:
+      containers:
+      - name: prst-app
+        image: ghcr.io/seedlings-calm/prst:latest
+        args: [
+          "-c", "config.dev.yml",
+        ]  # 设置启动参数
+      imagePullSecrets:
+      - name: ghcr-secret

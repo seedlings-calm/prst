@@ -9,6 +9,7 @@ import (
 	"github.com/seedlings-calm/prst/app/router"
 	"github.com/seedlings-calm/prst/common"
 	cfg "github.com/seedlings-calm/prst/config"
+	"github.com/seedlings-calm/prst/db"
 	"github.com/seedlings-calm/prst/middleware"
 )
 
@@ -30,6 +31,9 @@ func main() {
 	if err != nil {
 		panic("初始化jwt失败")
 	}
+	//初始化db
+	db.GormMysql()
+
 	//初始化zaplogger
 	_ = common.LoggerInit()
 

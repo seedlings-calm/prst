@@ -13,3 +13,11 @@ logger:
  maxAge: 7  # 保留旧文件的最大天数
  level: 0   # zapcore.Level
  compress: false  #是否压缩/归档旧文件
+mysql:
+ host: "124.222.199.88"
+ port: "3306"
+ dbName: "go-admin"
+ user: "lunar"
+ password: "123456"
+ idleConn: 10
+ openConn: 100
