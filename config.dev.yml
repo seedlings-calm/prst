@@ -4,6 +4,16 @@ app:
  host: 0.0.0.0
   # 端口号
  port: 8080 # 服务端口号
+ssl:
+  # https对应的域名
+  domain: localhost:8000
+  # https开关
+  enable: false
+  # ssl 证书key
+  key: keystring
+  # ssl 证书路径
+  pem: temp/pem.pem
+
 # 日志
 logger: 
 #  stdout: "console" # 日志输出方式: console,file,  废弃使用，直接使用AppModel 来决定输出方式

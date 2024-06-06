@@ -11,16 +11,23 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-type GinLogger struct {
-	Logger *zap.Logger
+var Zap *zap.Logger
+
+func LoggerInit() {
+	config := cfg.Config.ZapLogger
+	if IsEmptyStruct(config) {
+		config = LoggerDefault()
+	}
+	_ = NewGinLogger(config)
+
+	zap.ReplaceGlobals(Zap)
 }
 
-func NewGinLogger(config cfg.ZapLogger) *GinLogger {
+func NewGinLogger(config cfg.ZapLogger) *zap.Logger {
 	core := newCore(config)
-
 	logger := zap.New(core)
-
-	return &GinLogger{Logger: logger}
+	Zap = logger
+	return Zap
 }
 
 func LumberjackLogger(config cfg.ZapLogger) *lumberjack.Logger {
@@ -53,12 +60,12 @@ func newCore(config cfg.ZapLogger) zapcore.Core {
 		zapcore.NewCore(consoleEncoder, consoleDebugging, config.Level),
 	)
 }
-func (g *GinLogger) Middleware() gin.HandlerFunc {
+func LoggerMiddleware() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		start := time.Now()
 		// 记录请求信息
-		g.Logger.Info(
+		Zap.Info(
 			c.Request.Method,
 			zap.String("path", c.Request.URL.Path),
 			zap.String("ip", c.ClientIP()),
@@ -69,16 +76,6 @@ func (g *GinLogger) Middleware() gin.HandlerFunc {
 		c.Next()
 
 	}
-}
-
-func LoggerInit() *GinLogger {
-	config := cfg.Config.ZapLogger
-	if IsEmptyStruct(config) {
-		config = LoggerDefault()
-	}
-
-	return NewGinLogger(config)
-
 }
 
 // 文件存储日志  配置

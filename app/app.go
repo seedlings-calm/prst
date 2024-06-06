@@ -1,28 +1,22 @@
-package core
+package app
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/seedlings-calm/prst/common"
-	cfg "github.com/seedlings-calm/prst/config"
 	"github.com/seedlings-calm/prst/db"
 	"github.com/seedlings-calm/prst/middleware"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
-
-var Ba = BaseApp{
-	Log: common.NewGinLogger(cfg.Config.ZapLogger),
-}
 
 type BaseApp struct {
 	//gin上下文本
 	Context *gin.Context
 	//日志
-	Log    *common.GinLogger
-	Mysql  *gorm.DB
-	errors error
+	Zap   *zap.Logger
+	Mysql *gorm.DB
 }
 
 func (e *BaseApp) MakeMysql() *BaseApp {
@@ -36,22 +30,9 @@ func (e *BaseApp) MakeContext(c *gin.Context) *BaseApp {
 	return e
 }
 
-func (e *BaseApp) MakeLog(config cfg.ZapLogger) {
-	e.Log = common.NewGinLogger(config)
-}
-
-func (e *BaseApp) AddError(err error) {
-	if e.errors == nil {
-		e.errors = err
-	} else if err != nil {
-		e.errors = fmt.Errorf("%v; %w", e.errors, err)
-	}
-}
-func (e *BaseApp) GetError() error {
-	defer func() {
-		e.errors = nil
-	}()
-	return e.errors
+func (e *BaseApp) MakeLog() *BaseApp {
+	e.Zap = common.Zap
+	return e
 }
 
 // SuccessResponse 发送成功响应
@@ -60,23 +41,32 @@ func (e *BaseApp) SuccessResponse(msg string, data interface{}) {
 	if msg == "" {
 		msg = "success"
 	}
-	res := Response{
+	res := &common.Response{
 		RequestId: xq,
 		Code:      http.StatusOK,
 		Message:   msg,
 		Data:      data,
 	}
-	jsonResponse(e.Context, res)
+	// switch e.Context.ContentType() {
+	// case "application/json":
+	// case "application/xml":
+	// case "application/x-protobuf":
+	// default:
+	// }
+	res.JsonResponse(e.Context)
 }
 
 // ErrorResponse 发送错误响应
 func (e *BaseApp) ErrorResponse(code int, message string) {
 	xq := middleware.GenerateXRequestIdFromContext(e.Context)
-	res := Response{
+	if code == 0 {
+		code = http.StatusInternalServerError
+	}
+	res := &common.Response{
 		RequestId: xq,
 		Code:      code,
 		Message:   message,
 		Data:      nil,
 	}
-	jsonResponse(e.Context, res)
+	res.JsonResponse(e.Context)
 }

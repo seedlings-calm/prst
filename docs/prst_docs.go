@@ -15,7 +15,7 @@ const docTemplateprst = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/example/{name}": {
+        "/api/v1/example/{name}/{phone}": {
             "get": {
                 "description": "展示例子",
                 "tags": [
@@ -28,13 +28,19 @@ const docTemplateprst = `{
                         "description": "名称",
                         "name": "name",
                         "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "手机号",
+                        "name": "phone",
+                        "in": "path"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/router.Respo"
+                            "$ref": "#/definitions/core.Response"
                         }
                     }
                 }
@@ -42,10 +48,17 @@ const docTemplateprst = `{
         }
     },
     "definitions": {
-        "router.Respo": {
+        "core.Response": {
             "type": "object",
             "properties": {
-                "info": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "message": {
+                    "type": "string"
+                },
+                "requestId": {
                     "type": "string"
                 }
             }

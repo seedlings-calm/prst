@@ -1,4 +1,4 @@
-package core
+package common
 
 import (
 	"github.com/gin-gonic/gin"
@@ -23,6 +23,16 @@ func NewResponse(code int, message string, data interface{}, reqId string) *Resp
 }
 
 // 发送标准化的 JSON 响应
-func jsonResponse(c *gin.Context, res Response) {
+func (res *Response) JsonResponse(c *gin.Context) {
 	c.AbortWithStatusJSON(res.Code, res)
+}
+
+func (res *Response) XmlResponse(c *gin.Context) {
+	c.Abort()
+	c.XML(res.Code, res)
+}
+
+func (res *Response) ProtobufResponse(c *gin.Context) {
+	c.Abort()
+	c.ProtoBuf(res.Code, res)
 }

@@ -1,4 +1,4 @@
-package core
+package app
 
 import (
 	"reflect"
@@ -26,7 +26,7 @@ type bindConstructor struct {
 	mux   sync.Mutex
 }
 
-func (e *BaseApp) Bind(d interface{}, bindings ...binding.Binding) *BaseApp {
+func (e *BaseApp) Bind(d interface{}, bindings ...binding.Binding) error {
 	var err error
 	if len(bindings) == 0 {
 		bindings = constructor.GetBindingForGin(d)
@@ -42,7 +42,6 @@ func (e *BaseApp) Bind(d interface{}, bindings ...binding.Binding) *BaseApp {
 			continue
 		}
 		if err != nil {
-			e.AddError(err)
 			break
 		}
 	}
@@ -50,9 +49,9 @@ func (e *BaseApp) Bind(d interface{}, bindings ...binding.Binding) *BaseApp {
 	//	return fmt.Errorf(`"validation failed: %s %s"`, failPath, msg)
 	//})
 	if err1 := vd.Validate(d); err1 != nil {
-		e.AddError(err1)
+		return err1
 	}
-	return e
+	return err
 }
 
 func (e *bindConstructor) GetBindingForGin(d interface{}) []binding.Binding {

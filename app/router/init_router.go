@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	jwt "github.com/seedlings-calm/prst/middleware"
+	jwt "github.com/seedlings-calm/prst/common"
 )
 
 // InitRouter 路由初始化，不要怀疑，这里用到了

@@ -1,7 +1,12 @@
 definitions:
-  router.Respo:
+  core.Response:
     properties:
-      info:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+      requestId:
         type: string
     type: object
 info:
@@ -10,7 +15,7 @@ info:
   title: prst API
   version: 0.0.1
 paths:
-  /api/v1/example/{name}:
+  /api/v1/example/{name}/{phone}:
     get:
       description: 展示例子
       parameters:
@@ -18,11 +23,15 @@ paths:
         in: path
         name: name
         type: string
+      - description: 手机号
+        in: path
+        name: phone
+        type: string
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/router.Respo'
+            $ref: '#/definitions/core.Response'
       summary: 展示例子
       tags:
       - Example

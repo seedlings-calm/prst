@@ -4,14 +4,21 @@ import "go.uber.org/zap/zapcore"
 
 type FileConfig struct {
 	App       App         `json:"app" yaml:"app" mapstructure:"app"`
+	Ssl       Ssl         `json:"ssl" yaml:"ssl" mapstructure:"ssl"`
 	ZapLogger ZapLogger   `json:"logger" yaml:"logger" mapstructure:"logger"`
 	Mysql     MysqlConfig `json:"mysql" yaml:"mysql" mapstructure:"mysql"`
 }
 
+type Ssl struct {
+	KeyStr string `json:"keyStr" yaml:"keyStr" mapstructure:"keyStr"`
+	Pem    string `json:"pem" yaml:"pem" mapstructure:"pem"`
+	Enable bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
+	Domain string `json:"domain" yaml:"domain" mapstructure:"domain"`
+}
 type App struct {
 	Model string `json:"model" yaml:"model" mapstructure:"model"`
 	Host  string `json:"host" yaml:"host" mapstructure:"host"`
-	Port  string `json:"port" yaml:"port" mapstructure:"port"`
+	Port  int    `json:"port" yaml:"port" mapstructure:"port"`
 }
 
 // ZapLogger 定义日志配置参数

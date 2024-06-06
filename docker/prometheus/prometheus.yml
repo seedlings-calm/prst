@@ -1,9 +1,0 @@
-global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
- 
-scrape_configs:
-  - job_name: 'prst-prometheus'  # 配置job名
-    metrics_path: /metrics     # 定义metric获取的路径,默认也是此配置
-    static_configs:
-    - targets: ['host.docker.internal:8080']

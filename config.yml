@@ -1,8 +1,19 @@
 app: 
+ model: '' # 开发模式 dev,release 如果为空 ，根据读取文件定义模式，config.yml为release模式，其余为dev模式
   # 服务器ip，默认使用 0.0.0.0
  host: 0.0.0.0
   # 端口号
  port: 8080 # 服务端口号
+ssl:
+  # https对应的域名
+  domain: localhost:8000
+  # https开关
+  enable: false
+  # ssl 证书key
+  key: keystring
+  # ssl 证书路径
+  pem: temp/pem.pem
+
 # 日志
 logger: 
 #  stdout: "console" # 日志输出方式: console,file,  废弃使用，直接使用AppModel 来决定输出方式
@@ -12,3 +23,11 @@ logger:
  maxAge: 7  # 保留旧文件的最大天数
  level: 0   # zapcore.Level
  compress: false  #是否压缩/归档旧文件
+mysql:
+ host: "124.222.199.88"
+ port: "3306"
+ dbName: "go-admin"
+ user: "lunar"
+ password: "123456"
+ idleConn: 10
+ openConn: 100

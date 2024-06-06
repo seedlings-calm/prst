@@ -1,11 +1,16 @@
 package main
 
 import (
+	"errors"
+	"fmt"
+	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/gin-gonic/gin"
+	"github.com/seedlings-calm/prst/app"
 	"github.com/seedlings-calm/prst/app/router"
 	"github.com/seedlings-calm/prst/common"
 	cfg "github.com/seedlings-calm/prst/config"
@@ -13,7 +18,7 @@ import (
 	"github.com/seedlings-calm/prst/middleware"
 )
 
-var AppRouters = make([]func(r *gin.Engine, mw *middleware.GinJWTMiddleware), 0)
+var AppRouters = make([]func(r *gin.Engine, mw *common.GinJWTMiddleware), 0)
 
 func init() {
 	//  注册路由 fixme 其他应用的路由，在本目录新建文件放在init方法
@@ -27,7 +32,7 @@ func main() {
 	//初始化配置信息
 	_ = cfg.Setup()
 	//初始化jwt
-	jwtMW, err := common.JWTInit()
+	jwtMW, err := app.JWTInit()
 	if err != nil {
 		panic("初始化jwt失败")
 	}
@@ -35,42 +40,34 @@ func main() {
 	db.GormMysql()
 
 	//初始化zaplogger
-	_ = common.LoggerInit()
+	common.LoggerInit()
 
 	gin.SetMode(cfg.ModelSwitchGinModel())
 
-	r := gin.New()
-	//适配gin的运行模式
-
-	middleware.InitMiddleWare(r)
-
-	// r.Use(zapLogger.Middleware())
-
-	// 初始化 Prometheus 指标
-	prometheusMetrics := common.NewPrometheusMetrics()
-	// 注册 Prometheus 中间件
-	r.Use(common.PrometheusMiddleware(prometheusMetrics))
+	r := middleware.InitEngine()
 
 	//加载所有路由
 	for _, f := range AppRouters {
 		f(r, jwtMW)
 	}
-	// 设置 pprof 监听路径
-	// go func() {
-	// 	if err := http.ListenAndServe(cfg.Config.App.Host+":"+cfg.Config.App.Port, nil); err != nil {
-	// 		panic(err)
-	// 	}
-	// }()
 
-	// 定时记录内存使用情况和 CPU 使用率
-	// go func() {
-	// 	for {
-	// 		prometheusMetrics.RecordMemoryUsage()
-	// 		prometheusMetrics.RecordCPUUsage()
-	// 		time.Sleep(10 * time.Second)
-	// 	}
-	// }()
-	r.Run(":" + cfg.Config.App.Port)
+	srv := &http.Server{
+		Addr:    fmt.Sprintf("%s:%d", cfg.Config.App.Host, cfg.Config.App.Port),
+		Handler: r,
+	}
+
+	go func() {
+		// 服务连接
+		if cfg.Config.Ssl.Enable {
+			if err := srv.ListenAndServeTLS(cfg.Config.Ssl.Pem, cfg.Config.Ssl.KeyStr); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				log.Fatal("listen: ", err)
+			}
+		} else {
+			if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+				log.Fatal("listen: ", err)
+			}
+		}
+	}()
 
 	// 等待中断信号以优雅地关闭服务器
 	quit := make(chan os.Signal, 1)
