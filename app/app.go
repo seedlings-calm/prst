@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"github.com/seedlings-calm/prst/common"
 	"github.com/seedlings-calm/prst/db"
 	"github.com/seedlings-calm/prst/middleware"
@@ -17,10 +18,16 @@ type BaseApp struct {
 	//日志
 	Zap   *zap.Logger
 	Mysql *gorm.DB
+	Redis redis.UniversalClient
 }
 
 func (e *BaseApp) MakeMysql() *BaseApp {
 	e.Mysql = db.Db
+	return e
+}
+
+func (e *BaseApp) MakeRedis() *BaseApp {
+	e.Redis = db.Redis
 	return e
 }
 

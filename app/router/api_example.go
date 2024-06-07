@@ -12,9 +12,10 @@ func init() {
 
 // registerApiExampleRouter
 func registerApiExampleRouter(v1 *gin.RouterGroup, authMiddleware *jwt.GinJWTMiddleware) {
-	api := api.Example{}
+	exa := api.Example{}
 	r := v1.Group("/example")
 	{
-		r.GET("/:name/:phone", api.GetExample)
+		r.GET("/:name/:phone", exa.GetExample)
+		r.GET("/redis", exa.GetRedis)
 	}
 }

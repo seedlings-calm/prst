@@ -32,3 +32,14 @@ mysql:
  password: "123456"
  idleConn: 10
  openConn: 100
+redis:
+  #是否使用redis集群模式
+  useCluster: false
+  #使用集群模式addr和db默认无效
+  addr: 127.0.0.1:6379
+  db: 0
+  password: ""
+  clusterAddrs:
+    - "172.21.0.3:7000"
+    - "172.21.0.4:7001"
+    - "172.21.0.2:7002"

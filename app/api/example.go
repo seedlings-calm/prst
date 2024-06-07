@@ -1,6 +1,8 @@
 package api
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/seedlings-calm/prst/app"
 	"github.com/seedlings-calm/prst/app/models"
@@ -21,7 +23,7 @@ type Example struct {
 func (e Example) GetExample(c *gin.Context) {
 
 	data := models.Query{}
-	ba := e.MakeContext(c).MakeLog()
+	ba := e.MakeContext(c).MakeLog().MakeRedis()
 
 	err := ba.Bind(&data)
 	if err != nil {
@@ -29,6 +31,16 @@ func (e Example) GetExample(c *gin.Context) {
 		ba.ErrorResponse(500, err.Error())
 		return
 	}
+	ba.Redis.Set(c, "name", data.Name, time.Second*3)
+	ba.Redis.Set(c, "phone", data.Phone, time.Second*30)
+	ba.SuccessResponse("", data)
+}
 
+func (e Example) GetRedis(c *gin.Context) {
+	ba := e.MakeContext(c).MakeLog().MakeRedis()
+	data := models.Query{
+		Name:  ba.Redis.Get(c, "name").String(),
+		Phone: ba.Redis.Get(c, "phone").String(),
+	}
 	ba.SuccessResponse("", data)
 }
