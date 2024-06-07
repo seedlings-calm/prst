@@ -58,8 +58,8 @@ func main() {
 
 	go func() {
 		// 服务连接
-		if cfg.Config.Ssl.Enable {
-			if err := srv.ListenAndServeTLS(cfg.Config.Ssl.Pem, cfg.Config.Ssl.KeyStr); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if cfg.Config.App.Enable {
+			if err := srv.ListenAndServeTLS(cfg.Config.Ssl.Pem, cfg.Config.Ssl.Key); err != nil && !errors.Is(err, http.ErrServerClosed) {
 				log.Fatal("listen: ", err)
 			}
 		} else {
@@ -68,6 +68,9 @@ func main() {
 			}
 		}
 	}()
+	fmt.Println(common.Green("Server run at:"))
+	fmt.Printf("-  Local:   %s://localhost:%d/ \r\n", "http", cfg.Config.App.Port)
+	fmt.Printf("-  Local:   %s://localhost:%d/ \r\n", "https", cfg.Config.App.Port)
 
 	// 等待中断信号以优雅地关闭服务器
 	quit := make(chan os.Signal, 1)

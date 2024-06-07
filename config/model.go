@@ -10,15 +10,15 @@ type FileConfig struct {
 }
 
 type Ssl struct {
-	KeyStr string `json:"keyStr" yaml:"keyStr" mapstructure:"keyStr"`
+	Key    string `json:"key" yaml:"key" mapstructure:"key"`
 	Pem    string `json:"pem" yaml:"pem" mapstructure:"pem"`
-	Enable bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
 	Domain string `json:"domain" yaml:"domain" mapstructure:"domain"`
 }
 type App struct {
-	Model string `json:"model" yaml:"model" mapstructure:"model"`
-	Host  string `json:"host" yaml:"host" mapstructure:"host"`
-	Port  int    `json:"port" yaml:"port" mapstructure:"port"`
+	Model  string `json:"model" yaml:"model" mapstructure:"model"`
+	Host   string `json:"host" yaml:"host" mapstructure:"host"`
+	Port   int    `json:"port" yaml:"port" mapstructure:"port"`
+	Enable bool   `json:"enable" yaml:"enable" mapstructure:"enable"`
 }
 
 // ZapLogger 定义日志配置参数

@@ -27,3 +27,9 @@ build:
 
 .PHONY: build
 
+
+
+ssl:
+	@chmod +x ./ssl/setup.sh
+	./ssl/setup.sh
+.PHONY: ssl

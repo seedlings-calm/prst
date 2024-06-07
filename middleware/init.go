@@ -25,6 +25,7 @@ func InitEngine() *gin.Engine {
 
 	r.Use(RequestId(XRequestId))
 	r.Use(Options()).Use(Secure)
+
 	return r
 }
 

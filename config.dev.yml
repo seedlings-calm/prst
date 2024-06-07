@@ -4,15 +4,16 @@ app:
  host: 0.0.0.0
   # 端口号
  port: 8080 # 服务端口号
+ # 是否开启ssl
+ enable: true
+
 ssl:
   # https对应的域名
-  domain: localhost:8000
-  # https开关
-  enable: false
+  domain: 0.0.0.0:8080
   # ssl 证书key
-  key: keystring
+  key: ssl/key.pem
   # ssl 证书路径
-  pem: temp/pem.pem
+  pem: ssl/cert.pem
 
 # 日志
 logger: 

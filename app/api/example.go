@@ -24,7 +24,6 @@ func (e Example) GetExample(c *gin.Context) {
 	ba := e.MakeContext(c).MakeLog()
 
 	err := ba.Bind(&data)
-	panic("sdfsdfsdf")
 	if err != nil {
 		ba.Zap.Error("get_example", zap.Error(err))
 		ba.ErrorResponse(500, err.Error())
