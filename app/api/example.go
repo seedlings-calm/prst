@@ -23,7 +23,7 @@ type Example struct {
 func (e Example) GetExample(c *gin.Context) {
 
 	data := models.Query{}
-	ba := e.MakeContext(c).MakeLog().MakeRedis()
+	ba := e.MakeContext(c).MakeLog()
 
 	err := ba.Bind(&data)
 	if err != nil {
@@ -37,7 +37,7 @@ func (e Example) GetExample(c *gin.Context) {
 }
 
 func (e Example) GetRedis(c *gin.Context) {
-	ba := e.MakeContext(c).MakeLog().MakeRedis()
+	ba := e.MakeContext(c).MakeLog()
 	data := models.Query{
 		Name:  ba.Redis.Get(c, "name").String(),
 		Phone: ba.Redis.Get(c, "phone").String(),
