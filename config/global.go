@@ -1,6 +1,10 @@
 package cfg
 
-import "github.com/gin-gonic/gin"
+import (
+	"sync"
+
+	"github.com/gin-gonic/gin"
+)
 
 var (
 	DevModel          = "dev"
@@ -11,10 +15,10 @@ var (
 	ConfigReleaseFile = "config.yml"
 )
 
-var (
-	//全局配置
+type Conf struct {
 	Config FileConfig
-)
+	L      sync.RWMutex
+}
 
 func ModelSwitchGinModel() string {
 	switch AppModel {

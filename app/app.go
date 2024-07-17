@@ -26,11 +26,6 @@ func (e *BaseApp) MakeMysql() *BaseApp {
 	return e
 }
 
-func (e *BaseApp) MakeRedis() *BaseApp {
-	e.Redis = db.Redis
-	return e
-}
-
 // MakeContext 设置http上下文
 func (e *BaseApp) MakeContext(c *gin.Context) *BaseApp {
 	e.Context = c

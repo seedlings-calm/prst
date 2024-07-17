@@ -14,7 +14,7 @@ import (
 var Zap *zap.Logger
 
 func LoggerInit() {
-	config := cfg.Config.ZapLogger
+	config := cfg.GetGlobalConf().ZapLogger
 	if IsEmptyStruct(config) {
 		config = LoggerDefault()
 	}

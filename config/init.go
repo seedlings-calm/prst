@@ -2,12 +2,14 @@ package cfg
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
+)
+
+var (
+	globalConf Conf
 )
 
 // 配置来决定项目运行模式
@@ -44,21 +46,17 @@ func Setup() *viper.Viper {
 	if err != nil {
 		log.Fatalf("Fatal error config file: %s \n", err)
 	}
-
-	v.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("config file changed:", e.Name)
-		if err = v.Unmarshal(&Config); err != nil {
-			fmt.Println(err)
-		}
-	})
-	v.WatchConfig()
-
-	if err = v.Unmarshal(&Config); err != nil {
+	var conf FileConfig
+	if err = v.Unmarshal(&conf); err != nil {
 		panic(err)
 	}
 
+	globalConf.L.Lock()
+	globalConf.Config = conf
+	globalConf.L.Unlock()
+
 	//二次确定模式
-	switch Config.App.Model {
+	switch conf.App.Model {
 	case DevModel:
 		AppModel = DevModel
 	case ReleaseMode:
@@ -66,4 +64,10 @@ func Setup() *viper.Viper {
 	}
 
 	return v
+}
+
+func GetGlobalConf() FileConfig {
+	globalConf.L.RLock()
+	defer globalConf.L.RUnlock()
+	return globalConf.Config
 }

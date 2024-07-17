@@ -15,8 +15,9 @@ import (
 var Db *gorm.DB
 
 func GormMysql() {
+	config := cfg.GetGlobalConf().Mysql
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		cfg.Config.Mysql.User, cfg.Config.Mysql.Password, cfg.Config.Mysql.Host, cfg.Config.Mysql.Port, cfg.Config.Mysql.DBName)
+		config.User, config.Password, config.Host, config.Port, config.DBName)
 
 	DB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
@@ -34,8 +35,8 @@ func GormMysql() {
 	}
 
 	// Set database connection pool parameters
-	sqlDB.SetMaxIdleConns(cfg.Config.Mysql.IdleConn) //  设置空闲连接池中的最大连接数。
-	sqlDB.SetMaxOpenConns(cfg.Config.Mysql.OpenConn) //  设置数据库的最大打开连接数。
+	sqlDB.SetMaxIdleConns(config.IdleConn) //  设置空闲连接池中的最大连接数。
+	sqlDB.SetMaxOpenConns(config.OpenConn) //  设置数据库的最大打开连接数。
 	sqlDB.SetConnMaxLifetime(time.Hour)
 	Db = DB
 }
