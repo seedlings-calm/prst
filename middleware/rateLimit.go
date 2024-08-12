@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/seedlings-calm/prst/tools"
+	"github.com/seedlings-calm/prst/pkg/ratelimiter"
 )
 
 var (
@@ -39,14 +39,14 @@ func RateLimitMiddleware() gin.HandlerFunc {
 		}
 		mu.Lock()
 		defer mu.Unlock()
-		userLimiter, ok := tools.GetUserRateLimiter(userId)
+		userLimiter, ok := ratelimiter.GetUserRateLimiter(userId)
 		if !ok {
-			rates := make(map[string]*tools.RateLimiter)
+			rates := make(map[string]*ratelimiter.RateLimiter)
 			for k, v := range Router {
-				item := tools.NewRateLimiter(v.MaxRequests, v.Window)
+				item := ratelimiter.NewRateLimiter(v.MaxRequests, v.Window)
 				rates[k] = item
 			}
-			userLimiter.SetUserRules(rates)
+			userLimiter.SetUserRules(userId, rates)
 		}
 		limiter := userLimiter.GetRateLimiter(path)
 		if !limiter.AllowRequest() {

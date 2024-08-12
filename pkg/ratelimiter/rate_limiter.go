@@ -1,4 +1,4 @@
-package tools
+package ratelimiter
 
 import (
 	"sync"
@@ -7,13 +7,12 @@ import (
 
 // 内存方式解决请求速率方案 用户和权限 多对多关系
 var (
-	userLimiters = make(map[string]*UserRateLimiter) // 用户速率限制器
-	mu           sync.Mutex
+	userLimiters sync.Map // 用户速率限制器
 )
 
 type UserRateLimiter struct {
 	Rules map[string]*RateLimiter
-	Mutex sync.Mutex
+	sync.RWMutex
 }
 
 func NewRateLimiter(maxReq int, window time.Duration) *RateLimiter {
@@ -29,34 +28,36 @@ type RateLimiter struct {
 	Timestamp   time.Time     //开始计时时间
 	MaxRequests int           //计时时间内最大请求次数
 	Window      time.Duration //计时单位
-	Mutex       sync.Mutex
+	sync.Mutex
 }
 
-func GetUserRateLimiter(userId string) (*UserRateLimiter, bool) {
-	mu.Lock()
-	defer mu.Unlock()
-
-	if limiter, exists := userLimiters[userId]; exists {
-		return limiter, true
+func GetUserRateLimiter(key string) (*UserRateLimiter, bool) {
+	limiterInterface, exists := userLimiters.Load(key)
+	if exists {
+		return limiterInterface.(*UserRateLimiter), true
 	}
-	return &UserRateLimiter{
+
+	// 如果用户的速率限制器不存在，初始化它
+	limiter := &UserRateLimiter{
 		Rules: make(map[string]*RateLimiter),
-	}, false
+	}
+	return limiter, false
 }
 
-// 增加使用速率的规则
-func (u *UserRateLimiter) SetUserRules(item map[string]*RateLimiter) {
-	u.Mutex.Lock()
-	defer u.Mutex.Unlock()
+// 增加使用速率的规则，并且存储
+func (u *UserRateLimiter) SetUserRules(key string, item map[string]*RateLimiter) {
+	u.Lock()
+	defer u.Unlock()
 	for k, v := range item {
 		u.Rules[k] = v
 	}
+	userLimiters.LoadOrStore(key, u)
 }
 
 // 根据用户和路由获取速率限制器
 func (ul *UserRateLimiter) GetRateLimiter(path string) *RateLimiter {
-	ul.Mutex.Lock()
-	defer ul.Mutex.Unlock()
+	ul.RLock()
+	defer ul.RUnlock()
 	limiter, ok := ul.Rules[path]
 	if !ok {
 		return nil
@@ -65,8 +66,8 @@ func (ul *UserRateLimiter) GetRateLimiter(path string) *RateLimiter {
 }
 
 func (rl *RateLimiter) AllowRequest() bool {
-	rl.Mutex.Lock()
-	defer rl.Mutex.Unlock()
+	rl.Lock()
+	defer rl.Unlock()
 
 	now := time.Now()
 	if now.Sub(rl.Timestamp) > rl.Window {
