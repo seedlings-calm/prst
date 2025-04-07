@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"os/signal"
@@ -29,6 +30,18 @@ func init() {
 // @version 0.0.1
 // @description gin框架API
 func main() {
+	// 定义已知值
+	base := 1 + 0.2
+	power := 90.0
+	result := 100.0
+
+	// 计算 x
+	x := result / math.Pow(base, power)
+
+	// 输出结果
+	fmt.Printf("x = %.14e\n", x)
+	fmt.Printf("x = %.14f\n", x)
+	return
 	//初始化配置信息
 	_ = cfg.Setup()
 	//初始化jwt
